@@ -6,12 +6,20 @@ function UsuariosLista() {
         <div>
             <h1>Lista de usuarios</h1>
             <p>Pasando PROPS uno por uno</p>
-
-            <div style={}></div>
-            <ul>
-                <li><Link to="/usuario/123">Ver perfil del usuario Juan Perez (123)</Link></li>
-                <li><Link to="/usuario/217">Ver perfil del usuario Ana Gomez (217)</Link></li>
-            </ul>
+            <div style={{display: 'flex', flexDireccion: 'column', gap: '15px'}}>
+                <usuarioCard
+                nombre="Juan Gonzalez"
+                rol="administrador"
+                estado="activo"
+                imagen="https://randomuser.me/api/portraits/men/32.jpg"
+                />
+                <usuarioCard
+                nombre="marcela juliana"
+                rol="diseñadora"
+                estado="Inactivo"
+                imagen="https://randomuser.me/api/portraits/women/32.jpg"
+                />
+            </div>
         </div>
     );
 }

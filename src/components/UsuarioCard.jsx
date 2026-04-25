@@ -1,5 +1,4 @@
 import './UsuarioCard.css';
-import UsuarioCard from '../components/UsuarioCard';
 
 function UsuarioCard({ nombre, rol, estado, imagen}){
     const claseEstado = estado === 'Activo' ? 'badge-activo' : 'badge-inactivo';
