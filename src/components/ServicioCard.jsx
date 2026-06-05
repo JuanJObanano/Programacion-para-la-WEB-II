@@ -2,9 +2,9 @@ import './ServicioCard.css';
 import imagenServicio from '../assets/servicio-web.jpg';
 
 function ServicioCard() {
-   const nombreServicio = "Desarrollo Web a Medida";
+  const nombreServicio = "Desarrollo Web a Medida";
   const descripcion = "Creamos Single Page Applications ultrarrápidas utilizando React y Vite para potenciar tu negocio.";
-  const precio = "$500 USD";
+  const precio = "$1500 USD";
   const enOferta = true; 
   
   return (
@@ -12,7 +12,7 @@ function ServicioCard() {
         <div className="card-imagen-contenedor">
         <img src={imagenServicio} alt="Servicio Web" className="card-imagen" />
         
-        {enOferta && <span className="card-etiqueta">¡Oferta Especial!</span>}
+        {enOferta && <span className="card-etiqueta">¡Oferta Super Especial!</span>}
       </div>
 
       

@@ -43,3 +43,12 @@
     font-weight: 500;
     color: #475569;
 }
+
+.link-favoritos {
+    text-decoration: none;
+    background: #f1f5f9;
+    padding: 8px 15px;
+    border-radius: 20px;
+    color: #0f172a;
+    font-weight: bold;
+}
