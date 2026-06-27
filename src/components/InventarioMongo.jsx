@@ -1,76 +1,123 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function NuevoProductoMongo (){
+export default function InventarioMongo(){
+    const [productos, setProductos] = useState([]);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState(null);
 
-    const [nombre, setNombre] = useState('');
-    const [precio, setPrecio] = useState('');
-    const [enviando, setEnviando] = useState(false);
+    const API_URL = "mongodb+srv://juanjose1234obando_db_user:<1073157021samuel>@cluster0.zzupwj1.mongodb.net/?appName=Cluster0"
 
-    const API_URL = 'mongodb+srv://juanjose1234obando_db_user:<1073157021samuel>@cluster0.zzupwj1.mongodb.net/?appName=Cluster0';
-
-    const manejarEnvio = async (e) => {
-        e.preventDefault();
-        setEnviando(true);
-
-        const nuevoProducto = {
-            nombre: nombre,
-            precio: Number(precio)
-        };
-
+    const obtenerProductos = async () => {
         try {
-            
-            const respuesta = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(nuevoProducto)
-            });
+            const respuesta = await fetch(API_URL);
 
-            if (respuesta.ok){
-                alert("Documento guardado con exito");
-                setNombre('');
-                setPrecio('');
-            } else {
-                alert("Error al guardar en la base de datos.");
+            if (!respuesta.ok){
+                throw new Error("Fallo al conectar...");
             }
 
+            const datosMongo = await respuesta.json();
+            setProductos(datosMongo);
         } catch (error) {
-            console.error("Error del servidor", error);
-            alert("Servidor apagado o inaccesible");
+            setError(error.message);
         } finally {
-            setEnviando(false);
+            setCargando(false);
         }
     }
 
-    return(
-        <form onSubmit={manejarEnvio} style={{background: '#fff', padding: '20px', borderRadius: '10px', border: '1px solid #e2e8f0', width: '300px'}}>
-            <h3>Nuevo Producto</h3>
+    useEffect(()=>{
+        obtenerProductos();
+    }, []);
 
-            <input type="text" 
-                placeholder='Nombre del producto'
-                value={nombre}
-                onChange={(e) => {setNombre(e.target.value)}}
-                required
-                style={{display: 'block', width: 'stretch', marginBottom: '10px', padding: '8px'}}
-            />
+    const eliminarProducto = async (idMongo) => {
+        if (!window.confirm("¿Seguro quiere eliminar el producto?")) return;
 
-            <input type="number" 
-                placeholder='Precio'
-                value={precio}
-                onChange={(e) => {setPrecio(e.target.value)}}
-                required
-                style={{display: 'block', width: 'stretch', marginBottom: '15px', padding: '8px'}}
-            />
+        try {
+            const respuesta = await fetch(`${API_URL}/${idMongo}`, {
+                method: 'DELETE'
+            });
 
-            <button 
-                type='submit'
-                disabled={enviando}
-                style={{background: '#3b82f6', color: 'white', padding: '10px', width: '100%', border: 'none', borderRadius: '5px', cursor: 'pointer'}}
-            >
-                {enviando ? 'Guardando en Mongo...' : 'Guardar Producto'}
-            </button>
-        </form>
+            if (respuesta.ok){
+                const nuevaLista = productos.filter((prod) => prod._id !== idMongo);
+                setProductos(nuevaLista);
+                alert("Producto eliminado correctamente");
+            } else {
+                alert("Error al eliminar");
+            }
+        } catch (error) {
+            console.error("Error en el servidor", error);
+        }
+    }
+
+    const aumentarPrecio = async (idMongo, precioActual) => {
+        const nuevoPrecio = precioActual + 10;
+
+        try {
+            const respuesta = await fetch(`${API_URL}/${idMongo}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ precio: nuevoPrecio})
+            });
+
+            if (respuesta.ok){
+                const listaActualizada = productos.map((prod)=>{
+                    if (prod._id === idMongo){
+                        return { ...prod, precio: nuevoPrecio}
+                    }
+                    return prod;
+                });
+
+                setProductos(listaActualizada);
+            }
+
+        } catch (error) {
+            console.error("Error al actualizar:", error);
+        }
+    };
+
+    if (cargando) return <h3>Consultando datos a la API</h3>;
+    if (error) return <h3 style={{color: 'red'}}>{error}</h3>;
+    
+    return (
+        <div style={{background: '#f8fafc', padding: '20px', borderRadius: '8px'}}>
+            <h2 style={{color: 'black'}}>Inventario desde Mongo</h2>
+            <ul style={{listStyle: 'none', padding: '0'}}>
+                {productos.map((prod)=>(
+                    <li key={prod._id || prod.id } style={{
+                        padding: '15px',
+                        border: '1px solid #cbd5e1',
+                        background: 'white',
+                        marginBottom: '10px',
+                        borderRadius: '5px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <div>
+                            <strong style={{fontSize: '1.1rem', color: '#0f172a'}}>{prod.nombre}</strong>
+                            <p style={{ 
+                                margin: '5px 0 0 0',
+                                color: '#10b981',
+                                fontWeight: 'bold'
+                            }}>
+                                Precio: ${prod.precio}
+                            </p>
+                        </div>
+
+                        <div style={{display: 'flex', gap: '10px'}}>
+                            <button onClick={() => aumentarPrecio(prod._id, prod.precio)} 
+                                style={{background: '#eab308', color: 'white', border: 'none', padding: '8px 12px', cursor: 'pointer', fontWeight: 'bold'}}>
+                                ✏️ +%10
+                            </button>
+                            <button onClick={() => eliminarProducto(prod._id)}
+                                style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 12px', cursor: 'pointer', fontWeight: 'bold'}}>
+                                🗑️ Borrar
+                            </button>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </div>
     );
-
 }

@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 function TopNav () {
     const { usuario } = useContext(AuthContext);
     const { favoritos } = useContext(FavoritosContext);
-    //const usuarioActual = "Juan Perez";
+    //const usuarioActual = "Juan Gonzalez";
 
     return(
         <header className='topnav'>

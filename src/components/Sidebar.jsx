@@ -10,7 +10,7 @@ function Sidebar() {
     return (
         <aside className="sidebar">
             <div className='sidebar-logo'>
-                <h2>Admin </h2>
+                <h2>Admin</h2>
             </div>
             <nav className='sidebar-menu'>
                 <NavLink to="/" className={({isActive}) => isActive ? "menu-item activo" : "menu-item"} end>
